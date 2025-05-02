@@ -14,7 +14,7 @@ const PaymentPage: React.FC = () => {
   const [paymentProof, setPaymentProof] = useState<File | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   
-  const upiId = "9104411978@ybl";
+  const upiId = "trueship@ybl";
   
   const handleCopyUPI = () => {
     navigator.clipboard.writeText(upiId);

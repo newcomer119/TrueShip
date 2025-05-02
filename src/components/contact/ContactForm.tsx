@@ -1,53 +1,39 @@
-import React, { useState } from 'react';
-import { collection, addDoc } from 'firebase/firestore';
-import { db } from '../../utils/firebase';
+import React, { useState, useRef } from 'react';
+import emailjs from '@emailjs/browser';
 import Button from '../common/Button';
 import Card from '../common/Card';
 
-interface ContactFormData {
-  name: string;
-  email: string;
-  message: string;
-}
-
 const ContactForm: React.FC = () => {
-  const [formData, setFormData] = useState<ContactFormData>({
-    name: '',
-    email: '',
-    message: '',
-  });
+  const form = useRef<HTMLFormElement>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
-  
+  const [error, setError] = useState('');
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
-    
+    setError('');
+
     try {
-      await addDoc(collection(db, 'contacts'), {
-        ...formData,
-        timestamp: new Date().toISOString()
-      });
-      
-      setSubmitted(true);
-      setFormData({ name: '', email: '', message: '' });
+      if (form.current) {
+        await emailjs.sendForm(
+          'YOUR_SERVICE_ID',
+          'YOUR_TEMPLATE_ID',
+          form.current,
+          'YOUR_PUBLIC_KEY'
+        );
+        setSubmitted(true);
+        if (form.current) {
+          form.current.reset();
+        }
+      }
     } catch (error) {
-      console.error('Error submitting contact form:', error);
+      setError('Failed to send message. Please try again later.');
     } finally {
       setIsSubmitting(false);
     }
   };
-  
-  const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
-  ) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
-  };
-  
+
   return (
     <Card className="max-w-md w-full mx-auto p-6 bg-white/10 backdrop-blur-sm border border-white/20">
       {submitted ? (
@@ -64,55 +50,68 @@ const ContactForm: React.FC = () => {
           </Button>
         </div>
       ) : (
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form ref={form} onSubmit={handleSubmit} className="space-y-4">
           <div>
             <label htmlFor="name" className="block text-sm font-medium text-white/90 mb-1">
               Name
             </label>
             <input
               type="text"
-              id="name"
-              name="name"
+              name="user_name"
               required
-              value={formData.name}
-              onChange={handleChange}
               className="w-full px-3 py-2 bg-white/5 border border-white/20 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-white placeholder-white/50"
               placeholder="Your name"
             />
           </div>
-          
+
           <div>
             <label htmlFor="email" className="block text-sm font-medium text-white/90 mb-1">
               Email
             </label>
             <input
               type="email"
-              id="email"
-              name="email"
+              name="user_email"
               required
-              value={formData.email}
-              onChange={handleChange}
               className="w-full px-3 py-2 bg-white/5 border border-white/20 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-white placeholder-white/50"
               placeholder="your@email.com"
             />
           </div>
-          
+
+          <div>
+            <label htmlFor="domain" className="block text-sm font-medium text-white/90 mb-1">
+              Preferred Domain
+            </label>
+            <select
+              name="domain"
+              required
+              className="w-full px-3 py-2 bg-white/5 border border-white/20 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-white"
+            >
+              <option value="">Select a domain</option>
+              <option value="Web Development">Web Development</option>
+              <option value="Machine Learning">Machine Learning</option>
+              <option value="Data Analytics">Data Analytics using Python</option>
+              <option value="AI Workflow">AI Workflow Automation</option>
+              <option value="AI Tools">AI Tools</option>
+            </select>
+          </div>
+
           <div>
             <label htmlFor="message" className="block text-sm font-medium text-white/90 mb-1">
               Message
             </label>
             <textarea
-              id="message"
               name="message"
               required
-              value={formData.message}
-              onChange={handleChange}
               rows={4}
               className="w-full px-3 py-2 bg-white/5 border border-white/20 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-white placeholder-white/50"
-              placeholder="Your message..."
+              placeholder="Your message or questions..."
             />
           </div>
-          
+
+          {error && (
+            <div className="text-red-400 text-sm">{error}</div>
+          )}
+
           <Button
             type="submit"
             variant="primary"

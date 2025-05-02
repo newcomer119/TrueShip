@@ -57,15 +57,11 @@ const Navbar: React.FC = () => {
             >
               Projects
             </Link>
-            <Link 
-              to="/login" 
-              className={`text-sm font-medium transition-colors ${
-                location.pathname === '/login' ? 'text-white' : 'text-white/70 hover:text-white'
-              }`}
+            <a 
+              href="https://forms.gle/Vfj2eeFUuY4jbBw9A"
+              target="_blank"
+              rel="noopener noreferrer"
             >
-              Login
-            </Link>
-            <Link to="/register">
               <Button 
                 variant="primary" 
                 size="sm"
@@ -73,7 +69,7 @@ const Navbar: React.FC = () => {
               >
                 Register Now
               </Button>
-            </Link>
+            </a>
           </div>
           
           <button 
@@ -110,15 +106,12 @@ const Navbar: React.FC = () => {
             >
               Projects
             </Link>
-            <Link 
-              to="/login" 
-              className={`text-base font-medium ${
-                location.pathname === '/login' ? 'text-white' : 'text-white/70'
-              }`}
+            <a 
+              href="https://forms.gle/Vfj2eeFUuY4jbBw9A"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="mt-2"
             >
-              Login
-            </Link>
-            <Link to="/register" className="mt-2">
               <Button 
                 variant="primary" 
                 fullWidth
@@ -126,7 +119,7 @@ const Navbar: React.FC = () => {
               >
                 Register Now
               </Button>
-            </Link>
+            </a>
           </div>
         </div>
       )}
